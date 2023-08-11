@@ -38,7 +38,7 @@ export const LoginComponent = ( {onData} ) => {
             await onData(values);
         } catch (error) {
             setLoading(false);
-            onFail("Usuario o contraseña incorrectos");
+            onFail("Usuario y/o contraseña incorrectos");
         }
         setLoading(false);
     };
@@ -91,10 +91,11 @@ export const LoginComponent = ( {onData} ) => {
         </div>
     )
 }
+
 LoginComponent.propTypes = {
     title: PropTypes.string.isRequired
-  }
+}
   
-  LoginComponent.defaultProps = {
+LoginComponent.defaultProps = {
     title: "Hola mundo"
-  }
+}
