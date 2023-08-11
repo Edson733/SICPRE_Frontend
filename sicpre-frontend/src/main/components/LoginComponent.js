@@ -1,51 +1,84 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import logo from '../assets/images/logo.png';
-import {Button, Form} from 'react-bootstrap';
+import logo from '../assets/images/logo.png'
+import { Button, Form } from "react-bootstrap";
+import * as Yup from "yup";
 import '../assets/css/login.css';
 import PropTypes from 'prop-types';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faSpinner} from '@fortawesome/free-solid-svg-icons';
+import { useFormik } from 'formik';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { onFail } from "../utils/Alerts";
 
-export const LoginComponent = ({onData}) => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+export const LoginComponent = ( {onData} ) => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState("");
 
-    const onAuth = async(event) => {
-        console.log("Hola desde onAuth: ", username);
-        event.preventDefault();
+    const formik = useFormik({
+        initialValues:{
+            username: "",
+            password: ""
+        },
+        validationSchema: Yup.object().shape({
+            username: Yup.string()
+                .email('Ingrese un correo electrónico válido')
+                .required('Ingrese su correo electrónico'),
+            password: Yup.string().required("Contraseña obligatoria")
+        }),
+        onSubmit: async(values) => {
+            console.log("Values: ", values);
+            await onAuth(values);
+        }
+    });
+
+    const onAuth = async (values) => {
+        console.log('Hola desde onAuth: ', values);
         setLoading(true);
-        await onData({username, password, setLoading, setErrors});
+        try {
+            await onData(values);
+        } catch (error) {
+            setLoading(false);
+            onFail("Usuario o contraseña incorrectos");
+        }
+        setLoading(false);
     };
 
     return (
-        <div className="container py-5 h-100 rounded">
+        <div className="container mt-4 h-100 rounded ">
             <div className="row d-flex justify-content-center align-items-center h-100">
                 <div className="col col-xl-10">
-                    <div className="card shadow">
+                    <div className="card shadow-lg" >
                         <div className="row g-0">
                             <div className="col-md-6 col-lg-7 d-flex align-items-center">
-                                <div className="card-body p-4 p-lg-5 text-black">
-                                    <Form onSubmit={event => onAuth(event)}>
+                                <div className="card-body p-4 p-lg-5 text-black" >
+                                    <Form onSubmit={formik.handleSubmit}>
                                         <div className="d-flex align-items-center mb-3 pb-1 justify-content-center">
-                                            <i className="fas fa-cubes fa-2x me-3"><img src={logo} alt="Corporate Clothing Group"/></i>
+                                            <i className="fas fa-cubes fa-2x me-3" ><img src={logo} alt="" /></i>
                                             <span className="h1 fw-bold mb-0">SICPRE</span>
                                         </div>
-                                        <h5 className="fw-normal mb-3 pb-3">Inicia Sesion</h5>
+
+                                        <h5 className="fw-normal mb-3 pb-3">Inicia sesion</h5>
+
                                         <Form.Group className="form-outline mb-4" controlId="formBasicEmail">
                                             <Form.Label className="form-label">Correo</Form.Label>
-                                            <Form.Control className="form-control form-control-lg" name="username" type="email" placeholder="edson@gmail.com" value={username} onChange={text => setUsername(text.target.value)}/>
-                                            {errors.username && <div className="alert alert-danger error">{errors.username}</div>}
+                                            <Form.Control className="form-control form-control-lg" name="username" type="email" placeholder="edson@gmail.com"
+                                                value={formik.values.username} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                            />
+                                            {formik.touched.username && formik.errors.username && <div className="error-message">{formik.errors.username}</div>}
                                         </Form.Group>
+
                                         <Form.Group className="form-outline mb-4" controlId="formBasicPassword">
                                             <Form.Label className="form-label">Contraseña</Form.Label>
-                                            <Form.Control className="form-control form-control-lg" name="password" type="password" placeholder="*************" value={password} onChange={text => setPassword(text.target.value)}/>
-                                            {errors.password && <div className="alert alert-danger error">{errors.password}</div>}
+                                            <Form.Control className="form-control form-control-lg" name="password" type="password" placeholder="*************"
+                                                value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                            />
+                                            {formik.touched.password && formik.errors.password && <div className="error-message" >{formik.errors.password}</div>}
                                         </Form.Group>
+
                                         <div className="pt-1 mb-4 text-center">
-                                            <Button className="btn btn-dark btn-lg btn-block" variant="primary" type="submit">{loading ? <FontAwesomeIcon icon={faSpinner} spin/> : "Ingresar"}</Button>
+                                            <Button  disabled={!formik.isValid || formik.isSubmitting} className="btn btn-dark btn-lg btn-block" variant="primary" type="submit">
+                                                {loading ? <FontAwesomeIcon icon={faSpinner} spin /> : "Ingresar"}
+                                            </Button>
                                         </div>
                                     </Form>
                                 </div>
@@ -56,13 +89,12 @@ export const LoginComponent = ({onData}) => {
                 </div>
             </div>
         </div>
-    );
-};
-
+    )
+}
 LoginComponent.propTypes = {
     title: PropTypes.string.isRequired
-};
-
-LoginComponent.defaultProps = {
-    title: "Hola Mundo"
-};
+  }
+  
+  LoginComponent.defaultProps = {
+    title: "Hola mundo"
+  }

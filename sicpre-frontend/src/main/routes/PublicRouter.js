@@ -6,7 +6,8 @@ const PublicRouter = ({children}) => {
     const {logged, user} = useContext(AuthContext);
     return (!logged) ? children : 
         (logged && (user.role === "Administrador")) ? 
-        <Navigate to={'/admin/listaProductos'}/> : <Navigate to={'/cliente/pedido'}/>
+        <Navigate to={'/admin/listaProductos'}/> : 
+        <Navigate to={'/cliente/pedido'}/>
 };
 
 export default PublicRouter;

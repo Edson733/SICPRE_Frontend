@@ -10,9 +10,8 @@ export const Login = () => {
 
     const onLogin = async(data) => {
         console.log("Hola desde Login: ", data);
+
         await LoginService(data).then(response => {
-            data.setErrors(null);
-            data.setLoading(false);
             console.log("Respuesta de SICPRE: ", response);
             login(response.data);
             if(response.data.role == "Administrador"){
@@ -21,8 +20,7 @@ export const Login = () => {
                 navigate('/cliente/pedido', {replace:true});
             }
         }).catch(error => {
-            console.log("Error desde Login: ", error);
-            data.setLoading(false);
+            console.log("Error desde Login.js: ", error);
         });
     };
 

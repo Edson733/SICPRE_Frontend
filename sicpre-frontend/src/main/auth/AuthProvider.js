@@ -13,12 +13,13 @@ const init = () => {
 
 export const AuthProvider = ({children}) => {
     const [authState, dispatch] = useReducer(AuthReducer, {}, init);
+
     const login = (data) => {
-        console.log('Hola desde AuthProvider ', data);
         const user = {
-            id: data.id,
-            username: data.username,
-            role: data.role
+            id: data.id, 
+            username: data.username, 
+            role: data.role,
+            name: data.name
         };
         const action = {
             type: types.login,
